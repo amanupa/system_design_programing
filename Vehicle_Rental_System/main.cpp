@@ -1,5 +1,6 @@
 #include <iostream>
 #include <memory>
+#include<chrono>
 #include "location/location.h"
 #include "rental_system/rental_system.h"
 #include "store/store.h"
@@ -11,13 +12,19 @@
 #include "user/user.h"
 #include "entity/engine_type.h"
 #include "entity/status_type.h"
+#include "payment/payment.h"
+#include "payment/cash_less.h"
+#include "payment/cash.h"
+#include "bill/bill.h"
 using namespace std;
+using namespace chrono;
 int main()
 {
 
     cout<<"Welcome to the Vehicle Rental System"<<endl;
 
     VehicleRentalSystem vehicleRentalSystem;
+    unique_ptr<Payment> paymentMethod;
 
 
     auto chandigarh = make_unique<Location>();
@@ -38,7 +45,7 @@ int main()
     );
 
 
-    Vehicle* carPtr = car1.get();
+    Vehicle& car1Ref = *car1;
 
 
     inventory1->addVehicle(
@@ -51,7 +58,7 @@ int main()
     );
 
 
-    Store* storePtr = store1.get();
+    Store& storeRef = *store1;
 
 
     chandigarh->addStore(
@@ -70,20 +77,42 @@ int main()
         "DL0001",
         "11111011111"
     );
+    User& userRef=*user.get();
 
 
     BookingServices bookingService(
-        *storePtr
+        storeRef
     );
 
-
-    bookingService.createBooking(
-        carPtr,
-        user.get(),
+    auto start = high_resolution_clock::now();
+    auto booking=bookingService.createBooking(
+        car1Ref,
+        userRef,
         "10-07-2026",
         "12-07-2026",
         2
     );
+    auto end = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(end-start);
+    cout << "Execution time: " << duration.count() << " ms" << endl;
+    
+
+    int n = 0;
+    
+        cout << "Select payment method to pay the booking amount: ₹ " << booking->getTotalBookingDays() * booking->getVehicle().getRentPrice() << endl;
+        cout << "1. Online Payment" << endl;
+        cout << "2. Cash Payment" << endl;
+        cin >> n;
+
+        if(n == 1){
+        paymentMethod = make_unique<OnlinePayment>();
+        } else {
+        paymentMethod = make_unique<CashPayment>();
+        }
+        paymentMethod->pay();
+
+    Bill bill(*booking);
+    bill.generateBill();
 
     return 0;
 }

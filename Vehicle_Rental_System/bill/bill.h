@@ -28,16 +28,16 @@ public:
     {
         billId=globalBillCounter++;
 
-        userName = booking.getUser()->getUserName();
-        licenseNumber = booking.getUser()->getDrivingLiscenceNumber();
+        userName = booking.getUser().getUserName();
+        licenseNumber = booking.getUser().getDrivingLiscenceNumber();
 
-        vehicleNumber = booking.getVehicle()->getRegistrationNumber();
-        vehicleModel = booking.getVehicle()->getModel();
+        vehicleNumber = booking.getVehicle().getRegistrationNumber();
+        vehicleModel = booking.getVehicle().getModel();
 
         fromDate = booking.getFromDate();
         toDate = booking.getToDate();
 
-        totalCharge = booking.getTotalBookingDays() * booking.getVehicle()->getRentPrice();
+        totalCharge = booking.getTotalBookingDays() * booking.getVehicle().getRentPrice();
     }
 
 
