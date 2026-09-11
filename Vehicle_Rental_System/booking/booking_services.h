@@ -4,10 +4,6 @@
 #include "booking.h"
 #include "../entity/status_type.h"
 #include "../store/store.h"
-#include "../payment/payment.h"
-#include "../payment/cash_less.h"
-#include "../payment/cash.h"
-#include "../bill/bill.h"
 #include<vector>
 #include<iostream>
 #include <memory>
@@ -20,21 +16,21 @@ class BookingServices{
     int bookingCounter=1;
     public:
     BookingServices(Store& store):store(store){}
-    void createBooking(
-        Vehicle* vehicle,
-        User* user,
+    Booking* createBooking(
+        Vehicle& vehicle,
+        User& user,
         string fromDate,
         string toDate,
         int totalDays
     )
     {
-        if(vehicle->getStatus() != Status::AVAILABLE)
+        if(vehicle.getStatus() != Status::AVAILABLE)
         {
             throw runtime_error(
                 "Vehicle is not available"
             );
         }
-        vehicle->updateStatus(Status::BOOKED);
+        vehicle.updateStatus(Status::BOOKED);
         auto booking=make_unique<Booking> (
             bookingCounter++,
             vehicle,
@@ -43,26 +39,9 @@ class BookingServices{
             toDate,
             totalDays
         );
-        
-        int n = 0;
-    
-        cout << "Select payment method to pay the booking amount: ₹ " << totalDays * booking->getVehicle()->getRentPrice() << endl;
-        cout << "1. Online Payment" << endl;
-        cout << "2. Cash Payment" << endl;
-        cin >> n;
-        unique_ptr<Payment> paymentMethod;
-
-        if(n == 1){
-        paymentMethod = make_unique<OnlinePayment>();
-        } else {
-        paymentMethod = make_unique<CashPayment>();
-        }
-
-        paymentMethod->pay();
-
-        Bill bill(*booking);
-        bill.generateBill();
+        auto result=booking.get();
         store.addBooking(move(booking));
+        return result;
 
     }
     
@@ -99,7 +78,7 @@ class BookingServices{
        const auto& bookings=store.getBookings();
         for(auto& booking : bookings)
         {
-            if(booking->getUser()->getId() == userId)
+            if(booking->getUser().getId() == userId)
             {
                 userBookings.push_back(booking.get());
             }
@@ -115,7 +94,7 @@ class BookingServices{
                 "Booking not found"
             );
         }
-        booking->getVehicle()->updateStatus(Status::AVAILABLE);
+        booking->getVehicle().updateStatus(Status::AVAILABLE);
 
     }
 
