@@ -29,6 +29,8 @@ public:
   double getPrice() const { return price; }
 
   bool isAvailable() const { return status == ShowSeatStatus::AVAILABLE; }
+  bool isLocked() const { return status == ShowSeatStatus::LOCKED; }
+  bool isBooked() const { return status == ShowSeatStatus::BOOKED; }
 
   void lock() {
     if (status == ShowSeatStatus::AVAILABLE)
@@ -38,7 +40,7 @@ public:
   void book() { status = ShowSeatStatus::BOOKED; }
 
   void release() {
-    if (status == ShowSeatStatus::LOCKED)
+    if (status == ShowSeatStatus::LOCKED || status == ShowSeatStatus::BOOKED)
       status = ShowSeatStatus::AVAILABLE;
   }
 

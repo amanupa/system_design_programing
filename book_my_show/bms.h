@@ -6,13 +6,15 @@
 using namespace std;
 
 #include "location.h"
+#include "booking/booking_service.h"
 
 class BookMyShow {
 private:
   vector<unique_ptr<Location>> locations;
+  BookingService bookingService;
 
 public:
-  BookMyShow() {}
+  BookMyShow() = default;
 
   void addLocation(Location &location) {
     locations.push_back(make_unique<Location>(std::move(location)));
@@ -28,7 +30,36 @@ public:
         return *location;
       }
     }
-    throw runtime_error("NO location found with this id.");
+    throw runtime_error("No location found with this id.");
+  }
+
+  BookingService &getBookingService() { return bookingService; }
+  const BookingService &getBookingService() const { return bookingService; }
+
+  //convenience methods for booking operations
+  Booking *createBooking(const string &userName, Show &show,
+                         const vector<int> &physicalSeatIds,
+                         const string &cinemaName = "",
+                         const string &hallName = "",
+                         const string &locationName = "") {
+    return bookingService.createBooking(userName, show, physicalSeatIds, cinemaName,
+                                        hallName, locationName);
+  }
+
+  bool cancelBooking(int bookingId) {
+    return bookingService.cancelBooking(bookingId);
+  }
+
+  Booking *getBooking(int bookingId) const {
+    return bookingService.getBooking(bookingId);
+  }
+
+  vector<Booking*> getAllBookings() const {
+    return bookingService.getAllBookings();
+  }
+
+  vector<Booking*> getBookingsByUser(const string &userName) const {
+    return bookingService.getBookingsByUser(userName);
   }
 
   BookMyShow(BookMyShow &&) = default;

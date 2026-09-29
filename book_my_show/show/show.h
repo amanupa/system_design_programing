@@ -51,6 +51,9 @@ public:
     return available;
   }
 
+  string getDate() const { return date; }
+  double getDuration() const { return duration; }
+
   int getAvailableSeatCount() const { return (int)getAvailableSeats().size(); }
 
   ShowSeat *findShowSeat(int showSeatId) {
@@ -59,6 +62,33 @@ public:
         return ss.get();
     }
     return nullptr;
+  }
+
+  ShowSeat *findShowSeatBySeatId(int physicalSeatId) {
+    for (auto &ss : showSeats) {
+      if (ss->getSeatId() == physicalSeatId)
+        return ss.get();
+    }
+    return nullptr;
+  }
+
+  void printSeatLayout() const {
+    cout << "\n  ┌─── Seat Layout for Show: " << name << " (" << stTime << " - " << enTime << ") ───" << endl;
+    for (const auto &ss : showSeats) {
+      string statusStr;
+      if (ss->isAvailable())
+        statusStr = "[AVAILABLE]";
+      else if (ss->getStatus() == ShowSeatStatus::LOCKED)
+        statusStr = "[LOCKED]";
+      else
+        statusStr = "[BOOKED]";
+
+      cout << "  │  Seat #" << ss->getSeatId()
+           << " | Type: " << seatTypeToString(ss->getSeatType())
+           << " | Price: Rs." << ss->getPrice()
+           << " | Status: " << statusStr << endl;
+    }
+    cout << "  └────────────────────────────────────────────────────────" << endl;
   }
 
   virtual ~Show() = default;
