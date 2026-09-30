@@ -45,13 +45,14 @@ int main() {
   cinepolis.addScreen(screen3);
 
   // 4. Setup Location and add Cinemas
-  Location chandigarh(1, "Chandigarh");
-  chandigarh.addCinema(pvr);
-  chandigarh.addCinema(cinepolis);
+  auto chandigarh= std::make_unique<Location>(1,"chandigarh");
+  //Location chandigarh(1, "Chandigarh");
+  chandigarh->addCinema(pvr);
+  chandigarh->addCinema(cinepolis);
 
   // 5. Initialize BookMyShow system
   BookMyShow bms;
-  bms.addLocation(chandigarh);
+  bms.addLocation(std::move(chandigarh));
 
   // 6. Setup Shows
   Show show1(101, "Oppenheimer", "18:00", "21:00", 3.0, "2026-09-30");

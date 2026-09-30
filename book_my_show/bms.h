@@ -16,8 +16,8 @@ private:
 public:
   BookMyShow() = default;
 
-  void addLocation(Location &location) {
-    locations.push_back(make_unique<Location>(std::move(location)));
+  void addLocation(unique_ptr<Location> location) {
+    locations.push_back(std::move(location));
   }
 
   const vector<unique_ptr<Location>> &getAllLocation() const {
